@@ -1,0 +1,43 @@
+version: '3'
+services:
+    web:
+        image: nginx
+        container_name: nginx
+        volumes:
+            - ./.docker/conf/nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - ./shared/nginx/user/:/var/www/html/user/
+            - ./shared/nginx/user/public/:/var/www/html/user/public/         
+        ports:
+            - 80:80
+        restart: always
+        depends_on:
+            - php
+            - db
+            - redis
+    php:
+        build: .docker
+        container_name: php-fpm7.3
+        restart: always
+        volumes:
+            - ./.docker/conf/php/php.ini:/etc/php/7.3/fpm/php.ini
+            - ./.docker/conf/php/www.conf:/etc/php/7.3/fpm/pool.d/www.conf        
+            - ./shared/nginx/user/public:/var/www/html/user/public/
+            - ./shared/nginx/user/:/var/www/html/user/         
+            - ./.docker/conf/supervisor/:/etc/supervisor/conf.d/
+    db:
+        image: postgres:latest
+        container_name: postgres
+        restart: always
+        environment:
+            - POSTGRES_DB=${DB_NAME}
+            - POSTGRES_USER=${DB_USER}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+        ports:
+            - 5432:5432
+        volumes:
+            - ./.docker/conf/postgres/:/docker-entrypoint-initdb.d/
+            - ./shared/postgres/data:/var/lib/postgresql/data
+    redis:
+        image: redis:latest
+        container_name: redis
+        restart: always
