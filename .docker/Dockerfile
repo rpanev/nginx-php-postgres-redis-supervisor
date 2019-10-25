@@ -22,7 +22,6 @@ RUN \
   sed -i 's/^\(\[supervisord\]\)$/\1\nnodaemon=true/' /etc/supervisor/supervisord.conf
 
 #RUN /docker-entrypoint.sh
-#ENTRYPOINT /usr/sbin/php-fpm7.3
 #ENTRYPOINT ["docker-entrypoint.sh"]
 # Define mountable directories.
 VOLUME ["/etc/supervisor/conf.d"]
